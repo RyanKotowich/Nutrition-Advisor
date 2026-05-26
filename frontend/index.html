@@ -1,1 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Nutrition Advisor</title>
+</head>
+<body>
+    <h1>AI Nutrition Advisor 🥗</h1>
 
+    <input id="calories" placeholder="Calories">
+    <input id="diet" placeholder="Diet type">
+    <button onclick="generate()">Generate</button>
+
+    <p id="output"></p>
+
+    <script>
+        function generate() {
+            let c = document.getElementById("calories").value;
+            let d = document.getElementById("diet").value;
+
+            document.getElementById("output").innerText =
+                "Calories: " + c + ", Diet: " + d;
+        }
+    </script>
+</body>
+</html>
