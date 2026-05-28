@@ -2,25 +2,56 @@
 <html>
 <head>
     <title>AI Nutrition Advisor</title>
-    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>AI Nutrition Advisor 🥗</h1>
 
-    <input id="calories" placeholder="Calories">
-    <input id="diet" placeholder="Diet type">
-    <button onclick="generate()">Generate</button>
+    <h1>AI Nutrition Advisor</h1>
 
+    <label>Calories:</label>
+    <input id="calories" type="number" placeholder="e.g. 2000">
+
+    <br><br>
+
+    <label>Diet:</label>
+    <input id="diet" type="text" placeholder="e.g. vegan">
+
+    <br><br>
+
+    <button onclick="generate()">Generate Meal Plan</button>
+
+    <h3>Result:</h3>
     <p id="output"></p>
 
     <script>
-        function generate() {
-            let c = document.getElementById("calories").value;
-            let d = document.getElementById("diet").value;
+        async function generate() {
+            const calories = document.getElementById("calories").value;
+            const diet = document.getElementById("diet").value;
 
-            document.getElementById("output").innerText =
-                "Calories: " + c + ", Diet: " + d;
+            const output = document.getElementById("output");
+            output.innerText = "Generating...";
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/api/plan", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        calories: calories,
+                        diet: diet
+                    })
+                });
+
+                const data = await response.json();
+
+                output.innerText = data.result;
+
+            } catch (error) {
+                console.log(error);
+                output.innerText = "Error connecting to backend.";
+            }
         }
     </script>
+
 </body>
 </html>
