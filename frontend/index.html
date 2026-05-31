@@ -2,33 +2,25 @@
 <html>
 <head>
     <title>AI Nutrition Advisor</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h1>AI Nutrition Advisor</h1>
+    <div class="container">
+        <h1>AI Nutrition Advisor</h1>
 
-    <label>Calories:</label>
-    <input id="calories" type="number" placeholder="e.g. 2000">
+        <input id="calories" placeholder="Calories">
+        <input id="diet" placeholder="Diet type">
 
-    <br><br>
+        <button onclick="generate()">Generate</button>
 
-    <label>Diet:</label>
-    <input id="diet" type="text" placeholder="e.g. vegan">
-
-    <br><br>
-
-    <button onclick="generate()">Generate Meal Plan</button>
-
-    <h3>Result:</h3>
-    <p id="output"></p>
+        <p id="output"></p>
+    </div>
 
     <script>
         async function generate() {
-            const calories = document.getElementById("calories").value;
-            const diet = document.getElementById("diet").value;
-
-            const output = document.getElementById("output");
-            output.innerText = "Generating...";
+            let calories = document.getElementById("calories").value;
+            let diet = document.getElementById("diet").value;
 
             try {
                 const response = await fetch("http://127.0.0.1:5000/api/plan", {
@@ -43,12 +35,10 @@
                 });
 
                 const data = await response.json();
-
-                output.innerText = data.result;
+                document.getElementById("output").innerText = data.result;
 
             } catch (error) {
-                console.log(error);
-                output.innerText = "Error connecting to backend.";
+                document.getElementById("output").innerText = "Error connecting to backend.";
             }
         }
     </script>
