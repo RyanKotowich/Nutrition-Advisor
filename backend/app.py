@@ -3,14 +3,14 @@ from flask_cors import CORS
 import requests
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app)
 
-DEEPSEEK_API_KEY = "Put key locally before running"
+OPENROUTER_API_KEY = "PASTE_YOUR_KEY_HERE"
 
 
 @app.route("/")
 def home():
-    return "Backend is running!"
+    return "AI Nutrition Advisor backend is running!"
 
 
 @app.route("/api/plan", methods=["POST"])
@@ -21,32 +21,43 @@ def plan():
     diet = data.get("diet")
 
     prompt = f"""
-    Create a simple healthy meal plan.
+    You are a nutrition assistant.
+
+    Create a simple meal plan.
 
     Calories: {calories}
     Diet: {diet}
 
-    Include breakfast, lunch, dinner.
-    Keep it simple and clear.
+    Include breakfast, lunch, and dinner.
     """
 
     response = requests.post(
-        "https://api.deepseek.com/chat/completions",
+        "https://openrouter.ai/api/v1/chat/completions",
         headers={
-            "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
-            "Content-Type": "application/json"
+            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "http://localhost:5500",
+            "X-Title": "AI Nutrition App"
         },
         json={
-            "model": "deepseek-chat",
+            "model": "mistralai/mistral-7b-instruct",
             "messages": [
                 {"role": "user", "content": prompt}
             ]
         }
     )
 
-    result = response.json()["choices"][0]["message"]["content"]
+    data = response.json()
 
-    return jsonify({"result": result})
+    try:
+        result = data["choices"][0]["message"]["content"]
+        return jsonify({"result": result})
+
+    except Exception:
+        return jsonify({
+            "result": "API ERROR",
+            "details": data
+        })
 
 
 if __name__ == "__main__":
