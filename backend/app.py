@@ -5,7 +5,7 @@ import requests
 app = Flask(__name__)
 CORS(app)
 
-OPENROUTER_API_KEY = "KEY_GOES_HERE"
+API_KEY = "KEY"
 
 
 @app.route("/")
