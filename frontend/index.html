@@ -7,40 +7,75 @@
 <body>
 
     <div class="container">
+
         <h1>AI Nutrition Advisor</h1>
 
+        <img src="nutrition.png" class="art">
+
         <input id="calories" placeholder="Calories">
+
         <input id="diet" placeholder="Diet type">
 
-        <button onclick="generate()">Generate</button>
+        <input id="goal" placeholder="Goal">
 
-        <p id="output"></p>
+        <button onclick="generate()">
+            Generate Meal Plan
+        </button>
+
+        <div id="output">
+            Your AI meal plan will appear here...
+        </div>
+
     </div>
 
     <script>
+
         async function generate() {
-            let calories = document.getElementById("calories").value;
-            let diet = document.getElementById("diet").value;
+
+            let calories =
+                document.getElementById("calories").value;
+
+            let diet =
+                document.getElementById("diet").value;
+
+            let goal =
+                document.getElementById("goal").value;
+
+            document.getElementById("output").innerText =
+                "Generating meal plan...";
 
             try {
-                const response = await fetch("http://127.0.0.1:5000/api/plan", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        calories: calories,
-                        diet: diet
-                    })
-                });
+
+                const response = await fetch(
+                    "http://127.0.0.1:5000/api/plan",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            calories: calories,
+                            diet: diet,
+                            goal: goal
+                        })
+                    }
+                );
 
                 const data = await response.json();
-                document.getElementById("output").innerText = data.result;
+
+                document.getElementById("output").innerText =
+                    data.result;
 
             } catch (error) {
-                document.getElementById("output").innerText = "Error connecting to backend.";
+
+                document.getElementById("output").innerText =
+                    "Error connecting to backend.";
+
             }
         }
+
     </script>
 
 </body>
