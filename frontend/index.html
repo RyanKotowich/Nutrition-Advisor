@@ -1,82 +1,97 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>AI Nutrition Advisor</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <h1>AI Nutrition Advisor</h1>
+    <div class="bubble">
 
-        <img src="nutrition.png" class="art">
+        <div class="left">
 
-        <input id="calories" placeholder="Calories">
+            <h1 class="title">AI Nutrition Advisor</h1>
 
-        <inaput id="diet" placeholder="Diet type">
+            <p class="subtitle">
+                Research-driven nutrition planning powered by AI
+            </p>
 
-        <input id="goal" placeholder="Goal">
+            <div class="summary">
+                <div>System Summary</div>
+                <div>Mode: —</div>
+                <div>Macros: —</div>
+                <div>Status: Ready</div>
+            </div>
 
-        <button onclick="generate()">
-            Generate Meal Plan
-        </button>
+            <img src="nutrition.png" class="chart">
 
-        <div id="output">
-            Your AI meal plan will appear here...
+        </div>
+
+        <div class="right">
+
+            <input id="age" placeholder="Age">
+            <input id="weight" placeholder="Weight">
+            <input id="calories" placeholder="Calories">
+            <input id="diet" placeholder="Diet">
+            <input id="goal" placeholder="Goal">
+
+            <button onclick="generate()">Generate Meal Plan</button>
+
+            <div id="output">
+                Your AI meal plan will appear here...
+            </div>
+
         </div>
 
     </div>
 
-    <script>
+</div>
 
-        async function generate() {
+<script>
 
-            let calories =
-                document.getElementById("calories").value;
+async function generate() {
 
-            let diet =
-                document.getElementById("diet").value;
+    const age = document.getElementById("age").value;
+    const weight = document.getElementById("weight").value;
+    const calories = document.getElementById("calories").value;
+    const diet = document.getElementById("diet").value;
+    const goal = document.getElementById("goal").value;
 
-            let goal =
-                document.getElementById("goal").value;
+    document.getElementById("output").innerText = "Generating...";
 
-            document.getElementById("output").innerText =
-                "Generating meal plan...";
+    try {
 
-            try {
+        const res = await fetch("http://127.0.0.1:5000/api/plan", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                age,
+                weight,
+                calories,
+                diet,
+                goal
+            })
+        });
 
-                const response = await fetch(
-                    "http://127.0.0.1:5000/api/plan",
-                    {
-                        method: "POST",
+        const data = await res.json();
 
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
+        document.getElementById("output").innerText = data.result;
 
-                        body: JSON.stringify({
-                            calories: calories,
-                            diet: diet,
-                            goal: goal
-                        })
-                    }
-                );
+    } catch (err) {
 
-                const data = await response.json();
+        document.getElementById("output").innerText =
+            "Error connecting to backend";
 
-                document.getElementById("output").innerText =
-                    data.result;
+    }
+}
 
-            } catch (error) {
-
-                document.getElementById("output").innerText =
-                    "Error connecting to backend.";
-
-            }
-        }
-
-    </script>
+</script>
 
 </body>
 </html>
