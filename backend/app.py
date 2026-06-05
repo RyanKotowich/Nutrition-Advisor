@@ -3,178 +3,139 @@ from flask_cors import CORS
 import requests
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
-API_KEY = "KEY"
+USDA_API_KEY = "62fgh4QUFFtgbSc0E3zjZyI////GsCSvzeyfuiSO6a0"
+OPENROUTER_API_KEY = "fa1022e44e709ee71a6f98147100f70c96e1f85e///////sk-or-v1-6599396112fecae8de7d9f07"
+
+
+def get_food(food_name):
+    url = "https://api.nal.usda.gov/fdc/v1/foods/search"
+
+    params = {
+        "query": food_name,
+        "pageSize": 1,
+        "api_key": USDA_API_KEY
+    }
+
+    res = requests.get(url, params=params)
+    data = res.json()
+
+    try:
+        food = data["foods"][0]
+
+        result = {
+            "name": food["description"],
+            "calories": 0,
+            "protein": 0,
+            "carbs": 0,
+            "fat": 0
+        }
+
+        for n in food.get("foodNutrients", []):
+            name = n.get("nutrientName", "").lower()
+            value = n.get("value", 0)
+
+            if "energy" in name:
+                result["calories"] = value
+            elif "protein" in name:
+                result["protein"] = value
+            elif "carbohydrate" in name:
+                result["carbs"] = value
+            elif "total lipid" in name:
+                result["fat"] = value
+
+        return result
+
+    except:
+        return None
 
 
 @app.route("/")
 def home():
-    return "backend works"
+    return "API running"
 
 
 @app.route("/api/plan", methods=["POST"])
 def plan():
-
-    data = request.get_json()
-
-    calories = int(data.get("calories"))
-    diet = data.get("diet")
-    goal = data.get("goal").lower().strip()
-
-    if goal in [
-        "muscle gain",
-        "bulk",
-        "bulking",
-        "strength"
-    ]:
-
-        protein_percent = 0.35
-        carb_percent = 0.45
-        fat_percent = 0.20
-
-        recommendation = (
-            "high protein and complex carbohydrates "
-            "for muscle growth and recovery"
-        )
-
-    elif goal in [
-        "weight loss",
-        "cut",
-        "cutting",
-        "fat loss"
-    ]:
-
-        protein_percent = 0.40
-        carb_percent = 0.30
-        fat_percent = 0.30
-
-        recommendation = (
-            "high satiety foods and increased fiber "
-            "for appetite control"
-        )
-
-    elif goal in [
-        "athlete",
-        "sports",
-        "performance"
-    ]:
-
-        protein_percent = 0.30
-        carb_percent = 0.50
-        fat_percent = 0.20
-
-        recommendation = (
-            "higher carbohydrates and hydration "
-            "for athletic performance"
-        )
-
-    else:
-
-        protein_percent = 0.30
-        carb_percent = 0.40
-        fat_percent = 0.30
-
-        recommendation = "balanced nutrition"
-
-    protein_grams = int(
-        (calories * protein_percent) / 4
-    )
-
-    carb_grams = int(
-        (calories * carb_percent) / 4
-    )
-
-    fat_grams = int(
-        (calories * fat_percent) / 9
-    )
-
-    prompt = f"""
-    Create a healthy meal plan that fits these requirements:
-
-    Calories: {calories}
-    Diet type: {diet}
-    Goal: {goal}
-
-    Nutritional targets:
-    - Protein: {protein_grams}g
-    - Carbohydrates: {carb_grams}g
-    - Fat: {fat_grams}g
-
-    Research-informed recommendation:
-    {recommendation}
-
-    Include:
-    - Breakfast
-    - Lunch
-    - Dinner
-
-    Keep it realistic and practical.
-    """
-
-    response = requests.post(
-        "https://openrouter.ai/api/v1/chat/completions",
-
-        headers={
-            "Authorization":
-                f"Bearer {OPENROUTER_API_KEY}",
-
-            "Content-Type":
-                "application/json",
-
-            "HTTP-Referer":
-                "http://localhost:5500",
-
-            "X-Title":
-                "AI Nutrition Advisor"
-        },
-
-        json={
-
-            "model":
-                "mistralai/mistral-7b-instruct",
-
-            "messages": [
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ]
-        }
-    )
-
-    result = response.json()
-
     try:
+        data = request.get_json()
 
-        ai_response = (
-            result["choices"][0]
-                  ["message"]
-                  ["content"]
-        )
+        calories = int(data.get("calories", 2000))
+        diet = data.get("diet", "")
+        goal = data.get("goal", "")
 
-        final_response = f"""
-Nutrition Targets
-
-Protein: {protein_grams}g
-Carbohydrates: {carb_grams}g
-Fat: {fat_grams}g
-
-AI Meal Plan
-
-{ai_response}
+        food_prompt = f"""
+Return 12 real foods for a {goal} diet with {diet} preference.
+Comma separated only. No explanation.
 """
 
-        return jsonify({
-            "result": final_response
-        })
+        food_response = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": "openai/gpt-oss-120b:free",
+                "messages": [{"role": "user", "content": food_prompt}]
+            }
+        )
 
-    except Exception:
+        food_text = food_response.json()["choices"][0]["message"]["content"]
 
-        return jsonify({
-            "result": "API ERROR",
-            "details": result
-        })
+        foods = [f.strip() for f in food_text.split(",") if f.strip()]
+        foods = list(dict.fromkeys(foods))
+
+        nutrition = []
+
+        for f in foods:
+            item = get_food(f)
+            if item:
+                nutrition.append(item)
+
+        context = "\n".join([
+            f"{i['name']} | {i['calories']} kcal | P:{i['protein']} C:{i['carbs']} F:{i['fat']}"
+            for i in nutrition
+        ])
+
+        prompt = f"""
+Create a daily meal plan.
+
+ONLY use foods from this list:
+{context}
+
+Goal: {goal}
+Diet: {diet}
+Calories: {calories}
+
+Format:
+Breakfast: ...
+Lunch: ...
+Dinner: ...
+Snacks: ...
+
+No extra text.
+"""
+
+        response = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": "openai/gpt-oss-120b:free",
+                "messages": [{"role": "user", "content": prompt}]
+            }
+        )
+
+        result = response.json()["choices"][0]["message"]["content"]
+
+        return jsonify({"result": result})
+
+    except Exception as e:
+        return jsonify({"result": "Error generating plan", "error": str(e)})
 
 
 if __name__ == "__main__":
