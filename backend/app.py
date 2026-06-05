@@ -5,8 +5,29 @@ import requests
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-USDA_API_KEY = "62fgh4QUFFtgbSc0E3zjZyI////GsCSvzeyfuiSO6a0"
-OPENROUTER_API_KEY = "fa1022e44e709ee71a6f98147100f70c96e1f85e///////sk-or-v1-6599396112fecae8de7d9f07"
+USDA_API_KEY = "fgh4QUFFtgbSc0E3zjZyIv/////GsCSvzeyfuiSO6a062///"
+OPENROUTER_API_KEY = "3b490466db78c64a1d99556e601cd78219315/////sk-or-v1-f949bc84f39e95c32bcb4f98eb7"
+
+
+def get_macro_targets(calories, goal):
+    if goal == "athletic":
+        ratios = {"protein": 0.30, "carbs": 0.45, "fat": 0.25}
+    elif goal == "cut":
+        ratios = {"protein": 0.40, "carbs": 0.30, "fat": 0.30}
+    elif goal == "bulk":
+        ratios = {"protein": 0.25, "carbs": 0.50, "fat": 0.25}
+    else:
+        ratios = {"protein": 0.30, "carbs": 0.40, "fat": 0.30}
+
+    protein_cal = calories * ratios["protein"]
+    carbs_cal = calories * ratios["carbs"]
+    fat_cal = calories * ratios["fat"]
+
+    return {
+        "protein_g": protein_cal / 4,
+        "carbs_g": carbs_cal / 4,
+        "fat_g": fat_cal / 9
+    }
 
 
 def get_food(food_name):
@@ -65,9 +86,15 @@ def plan():
         diet = data.get("diet", "")
         goal = data.get("goal", "")
 
+        macros = get_macro_targets(calories, goal)
+
         food_prompt = f"""
 Return 12 real foods for a {goal} diet with {diet} preference.
-Comma separated only. No explanation.
+
+Rules:
+- real USDA-style foods only
+- comma separated only
+- no explanation
 """
 
         food_response = requests.post(
@@ -95,27 +122,34 @@ Comma separated only. No explanation.
                 nutrition.append(item)
 
         context = "\n".join([
-            f"{i['name']} | {i['calories']} kcal | P:{i['protein']} C:{i['carbs']} F:{i['fat']}"
+            f"- NAME: {i['name']}\n  CALORIES: {i['calories']}\n  PROTEIN: {i['protein']}\n  CARBS: {i['carbs']}\n  FAT: {i['fat']}"
             for i in nutrition
         ])
 
         prompt = f"""
-Create a daily meal plan.
+You are a strict nutrition engine.
 
-ONLY use foods from this list:
+ONLY use foods from dataset.
+
+MACRO TARGETS (grams):
+Protein: {macros['protein_g']}
+Carbs: {macros['carbs_g']}
+Fat: {macros['fat_g']}
+
+DATASET:
 {context}
 
-Goal: {goal}
-Diet: {diet}
-Calories: {calories}
+Rules:
+- use only NAME values
+- do not invent foods
+- do not rename foods
+- balance meals across day
 
-Format:
+Output:
 Breakfast: ...
 Lunch: ...
 Dinner: ...
 Snacks: ...
-
-No extra text.
 """
 
         response = requests.post(
@@ -132,10 +166,18 @@ No extra text.
 
         result = response.json()["choices"][0]["message"]["content"]
 
-        return jsonify({"result": result})
+        return jsonify({
+            "result": result,
+            "macros": macros,
+            "calories": calories,
+            "goal": goal
+        })
 
     except Exception as e:
-        return jsonify({"result": "Error generating plan", "error": str(e)})
+        return jsonify({
+            "result": "Error generating plan",
+            "error": str(e)
+        })
 
 
 if __name__ == "__main__":
