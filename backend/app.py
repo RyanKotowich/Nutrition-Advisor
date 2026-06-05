@@ -89,7 +89,7 @@ def plan():
         macros = get_macro_targets(calories, goal)
 
         food_prompt = f"""
-Return 12 real foods for a {goal} diet with {diet} preference.
+Return 30 real foods for a {goal} diet with {diet} preference.
 
 Rules:
 - real USDA-style foods only
@@ -127,7 +127,7 @@ Rules:
         ])
 
         prompt = f"""
-You are a strict nutrition engine.
+You are strictly a nutrition engine, follow said instructions.
 
 ONLY use foods from dataset.
 
@@ -144,6 +144,7 @@ Rules:
 - do not invent foods
 - do not rename foods
 - balance meals across day
+-do not use asterisks
 
 Output:
 Breakfast: ...
