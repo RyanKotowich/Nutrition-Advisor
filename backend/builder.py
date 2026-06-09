@@ -59,7 +59,8 @@ def search_food(query):
     params = {
         "query": query,
         "pageSize": 10,
-        "api_key": USDA_API_KEY
+        "api_key": "fgh4QUFFtgbSc0E3zjZyIv/////GsCSvzeyfuiSO6a062"
+
     }
 
     res = requests.get(url, params=params)
