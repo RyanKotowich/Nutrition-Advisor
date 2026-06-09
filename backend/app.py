@@ -5,7 +5,7 @@ import requests
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-USDA_API_KEY = "fgh4QUFFtgbSc0E3zjZyIv/////GsCSvzeyfuiSO6a062///"
+USDA_API_KEY = "fgh4QUFFtgbSc0E3zjZyIv/////GsCSvzeyfuiSO6a062"
 OPENROUTER_API_KEY = "3b490466db78c64a1d99556e601cd78219315/////sk-or-v1-f949bc84f39e95c32bcb4f98eb7"
 
 
