@@ -2,7 +2,7 @@ import requests
 import json
 import time
 
-USDA_API_KEY = "fgh4QUFFtgbSc0E3zjZyIv/////GsCSvzeyfuiSO6a062"
+USDA_API_KEY = "GsCSvzeyfuiSO6a062///fgh4QUFFtgbSc0E3zjZyIv"
 
 search_terms = {
     "proteins": [
@@ -59,7 +59,7 @@ def search_food(query):
     params = {
         "query": query,
         "pageSize": 10,
-        "api_key": "fgh4QUFFtgbSc0E3zjZyIv/////GsCSvzeyfuiSO6a062"
+        "api_key": "GsCSvzeyfuiSO6a062///fgh4QUFFtgbSc0E3zjZyIv"
 
     }
 
