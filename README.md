@@ -1,3 +1,20 @@
 AI Nutrition Advisor is an AI powered app that helps you accurately accomplish your fitness goals, whether it be trying to gain, lose, or maintain a certain weight. Insert your age, weight, the amount of calories you want, your diet plan, and your goal. Given the user's information, our app will provide a meal plan of different foods for each meal of the day. To run this app, you host a development server and then you open it. The research paper we used was https://pmc.ncbi.nlm.nih.gov/articles/PMC11391091/. In this research paper, the writers argues that "As consumer-grade apps allow for a vast array of food items to be listed—often without clear sourcing information, users face the daunting task of navigating through numerous results to find the most accurate match for their consumed foods." In other words, many mainstream nutrition apps failed to provide accurate listing of the nutritional value the food they recommend.
+
+
+
+
 AI was mostly used for brainstorming and coming up with requirements to generate the best results possible. At first we just tested the api call and got foods to be generated, but it wasn't specific enough. The css was done by hand after learning the basic formatting techniques and AI fetched the api plan for the html script. For the backend, it was used mostly in the app.py script to come up with a set of rules and get the variables from the interface. The builder.py script utilized it to expand the database with each additional set of inputs. 
+
+
+
+
 AI was good at helping brainstorm the layout of the project, but when it came to specifics, it caused a lot of simple errors. For example, it kept telling us to use the command prompt to run the project instead of using the vscode live server. A major time saver was with manipulating the json data and polishing the interface a little with graphics.
+
+
+
+
+
+
+
+https://github.com/user-attachments/assets/367caee0-7c9b-45a6-9be3-412fce045c17
+
