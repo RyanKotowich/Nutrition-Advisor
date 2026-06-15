@@ -8,8 +8,17 @@ AI was mostly used for brainstorming and coming up with requirements to generate
 
 
 
-AI was good at helping brainstorm the layout of the project, but when it came to specifics, it caused a lot of simple errors. For example, it kept telling us to use the command prompt to run the project instead of using the vscode live server. A major time saver was with manipulating the json data and polishing the interface a little with graphics.
+AI was good at improving on existing concepts and traversing data as well as improving the css interface. Additionally, it was good at generating starter data for the builder. The best part was it simplifying the process to get a free api key since I spent 2 hours trying without success.
 
+
+
+It gave horrible ideas about how to not make the project a wrapper and consistantly told us to do things in the command prompt when we're using a vscode live server. Whenever we asked it how to improve something, it suggested changing other stuff as well which led to frequent breaks. 
+
+
+We learned that prompting requires precision and failure to do so would result in more issues than before. AI seems to often jump to conclusions about things so we also had to spend time clarifying to get good results. It's important to be very detailed.
+
+
+We would have asked less things in the beginng since the skills used to construct the api project were later used to edit our code. Coming up with our own ideas and having AI elaborate on them would have been much better than debating with AI to come up with a perfect solution from scratch.
 
 
 
